@@ -8,17 +8,24 @@ server:
 spring:
   application:
     name: sinlei-rag-agent
-    profiles:
-      active: local
-  mvc:
-    favicon:
-      enabled: false
-  ai:
-    dashscope:
-      api-key: sk-ed9898e7d18348b2a14b89e7bbeb8731
-      chat:
-        options:
-          model: qwen-plus
+  profiles:
+    active: local
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
 
 # springdoc-openapi项目配置
 springdoc:
@@ -31,12 +38,20 @@ springdoc:
   group-configs:
     - group: 'default'
       paths-to-match: '/**'
-      packages-to-scan: com.sinlei.controller
+      packages-to-scan: com.sinlei
 # knife4j的增强配置，不需要增强可以不配
 knife4j:
   enable: true
   setting:
     language: zh_cn
+# 文件上传配置
+rag:
+  file:
+    storage:
+      path: ./uploads
+  chunking:
+    intelligent-enabled: true
+
 # 日志配置
 logging:
   level:

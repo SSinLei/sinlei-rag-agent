@@ -11,6 +11,7 @@ import com.alibaba.dashscope.exception.InputRequiredException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.utils.JsonUtils;
 import com.sinlei.common.TestApiKey;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -21,6 +22,8 @@ import com.sinlei.common.TestApiKey;
  */
 public class SDKAiDashScopeInvoke {
 
+    @Value("spring.ai.dashscope.api-key")
+    private static String apiKey;
     public static GenerationResult callWithMessage() throws ApiException, NoApiKeyException, InputRequiredException {
         Generation gen = new Generation();
         Message systemMsg = Message.builder()
@@ -32,7 +35,7 @@ public class SDKAiDashScopeInvoke {
                 .content("你是谁？")
                 .build();
         GenerationParam param = GenerationParam.builder()
-                .apiKey(TestApiKey.API_KEY)
+                .apiKey(apiKey)
                 .model("qwen-plus")
                 .messages(Arrays.asList(systemMsg, userMsg))
                 .resultFormat(GenerationParam.ResultFormat.MESSAGE)
