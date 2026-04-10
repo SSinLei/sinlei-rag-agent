@@ -10,107 +10,540 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI短视频脚本工坊</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 24px; }
-        .row { margin-bottom: 12px; }
-        input, select, textarea, button { padding: 8px; margin-right: 8px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 12px; }
-        th, td { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
-        .muted { color: #666; font-size: 12px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 24px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        .row {
+            margin-bottom: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            padding: 10px 14px;
+            border: 2px solid #e8e8e8;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #aaa;
+        }
+
+        #topic {
+            flex: 2;
+            min-width: 200px;
+        }
+
+        #persona {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        #durationSec {
+            width: 100px;
+        }
+
+        #searchMode {
+            width: 120px;
+        }
+
+        #hooks {
+            flex: 1;
+            min-width: 400px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e8e8e8;
+        }
+
+        #scriptText {
+            width: 100%;
+            min-height: 150px;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.6;
+        }
+
+        .meta-info {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .meta-info span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .meta-info .label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 16px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .scene-no {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 50px;
+        }
+
+        .prompt-text {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            background: #f8f9fa;
+            padding: 6px 10px;
+            border-radius: 6px;
+            color: #333;
+            word-break: break-word;
+        }
+
+        .emotion-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .duration {
+            font-weight: 600;
+            color: #764ba2;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
     </style>
 </head>
 <body>
-<h2>AI短视频脚本工坊</h2>
-<div class="row">
-    <input id="topic" placeholder="输入主题，例如 iPhone16测评" size="36">
-    <input id="persona" placeholder="人设，例如 犀利吐槽风" size="20">
-    <input id="durationSec" type="number" value="60" min="15" max="300">
-    <select id="searchMode">
-        <option value="mock">mock</option>
-        <option value="real">real</option>
-    </select>
-    <button onclick="loadHooks()">生成开头方案</button>
-</div>
-<div class="row">
-    <select id="hooks" style="width: 640px;"></select>
-    <button onclick="generate()">生成完整脚本</button>
-</div>
-<div class="row">
-    <textarea id="scriptText" rows="6" cols="120" placeholder="生成后显示口播文案"></textarea>
-</div>
-<div class="row muted" id="meta"></div>
-<div class="row">
-    <button onclick="exportMd()">导出Markdown</button>
-    <button onclick="exportJson()">导出JSON</button>
-</div>
-<table id="sceneTable">
-    <thead>
-    <tr><th>场景</th><th>画面提示词</th><th>台词</th><th>情绪</th><th>时长</th></tr>
-    </thead>
-    <tbody></tbody>
-</table>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 AI短视频脚本工坊</h1>
+            <p>智能生成短视频脚本、分镜与画面提示词</p>
+        </div>
+
+        <div class="card">
+            <div class="card-title">基础配置</div>
+            <div class="row">
+                <div class="form-group">
+                    <label>主题</label>
+                    <input id="topic" placeholder="输入主题，例如 iPhone16测评">
+                </div>
+                <div class="form-group">
+                    <label>人设</label>
+                    <input id="persona" placeholder="人设，例如 犀利吐槽风">
+                </div>
+                <div class="form-group">
+                    <label>时长(秒)</label>
+                    <input id="durationSec" type="number" value="60" min="15" max="300">
+                </div>
+                <div class="form-group">
+                    <label>模式</label>
+                    <select id="searchMode">
+                        <option value="mock">mock</option>
+                        <option value="real">real</option>
+                    </select>
+                </div>
+                <div class="form-group" style="justify-content: flex-end;">
+                    <label>&nbsp;</label>
+                    <button class="btn-primary" onclick="loadHooks()">生成开头方案</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">选择开头</div>
+            <div class="row">
+                <select id="hooks">
+                    <option value="">请先点击"生成开头方案"</option>
+                </select>
+                <button class="btn-primary" onclick="generate()">生成完整脚本</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">口播文案</div>
+            <textarea id="scriptText" rows="6" placeholder="生成后显示口播文案"></textarea>
+        </div>
+
+        <div class="card">
+            <div class="card-title">操作</div>
+            <div class="action-buttons">
+                <button class="btn-secondary" onclick="exportMd()">📄 导出Markdown</button>
+                <button class="btn-secondary" onclick="exportJson()">📋 导出JSON</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">分镜表</div>
+            <div id="meta" class="meta-info" style="display: none;">
+                <span><span class="label">projectId:</span> <span id="meta-projectId">-</span></span>
+                <span><span class="label">title:</span> <span id="meta-title">-</span></span>
+                <span><span class="label">mode:</span> <span id="meta-mode">-</span></span>
+            </div>
+            <table id="sceneTable">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">场景</th>
+                        <th>画面提示词</th>
+                        <th>台词</th>
+                        <th style="width: 80px;">情绪</th>
+                        <th style="width: 70px;">时长</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
+                                </svg>
+                                <p>生成脚本后将显示分镜表</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
 <script>
-    /** 最近一次生成返回的 projectId，用于导出 */
     let currentProjectId = null;
+    let isLoading = false;
 
-    /** 调用 /hooks，填充下拉框 */
+    function setLoading(loading, btn) {
+        isLoading = loading;
+        if (btn) {
+            btn.disabled = loading;
+            btn.innerHTML = loading ? '<span class="loading"></span> 处理中...' : (btn.dataset.originalText || btn.textContent);
+        }
+    }
+
     async function loadHooks() {
-        const body = {
-            topic: document.getElementById('topic').value,
-            persona: document.getElementById('persona').value,
-            searchMode: document.getElementById('searchMode').value
-        };
-        const res = await fetch('/api/shortvideo/hooks', {
-            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)
-        });
-        const data = await res.json();
-        const hooksSelect = document.getElementById('hooks');
-        hooksSelect.innerHTML = '';
-        (data.data || []).forEach(h => {
-            const option = document.createElement('option');
-            option.value = h;
-            option.text = h;
-            hooksSelect.appendChild(option);
-        });
+        const topic = document.getElementById('topic').value;
+        if (!topic) {
+            alert('请输入主题');
+            return;
+        }
+
+        const btn = event.target;
+        btn.dataset.originalText = btn.textContent;
+        setLoading(true, btn);
+
+        try {
+            const body = {
+                topic: topic,
+                persona: document.getElementById('persona').value,
+                searchMode: document.getElementById('searchMode').value
+            };
+            const res = await fetch('/api/shortvideo/hooks', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
+            });
+            const data = await res.json();
+            const hooksSelect = document.getElementById('hooks');
+            hooksSelect.innerHTML = '';
+            (data.data || []).forEach(h => {
+                const option = document.createElement('option');
+                option.value = h;
+                option.text = h;
+                hooksSelect.appendChild(option);
+            });
+
+            if (data.data && data.data.length > 0) {
+                hooksSelect.value = data.data[0];
+            }
+        } catch (e) {
+            alert('生成开头失败: ' + e.message);
+        } finally {
+            setLoading(false, btn);
+        }
     }
 
-    /** 调用 /generate，展示口播与分镜表 */
     async function generate() {
-        const body = {
-            userId: 'web-user',
-            topic: document.getElementById('topic').value,
-            persona: document.getElementById('persona').value,
-            durationSec: parseInt(document.getElementById('durationSec').value, 10),
-            selectedHook: document.getElementById('hooks').value,
-            searchMode: document.getElementById('searchMode').value
-        };
-        const res = await fetch('/api/shortvideo/generate', {
-            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)
-        });
-        const data = await res.json();
-        const result = data.data || {};
-        currentProjectId = result.projectId;
-        document.getElementById('scriptText').value = result.scriptText || '';
-        document.getElementById('meta').innerText = `projectId=${result.projectId || '-'} | title=${result.title || '-'} | mode=${(result.meta || {}).searchMode || '-'}`;
+        const topic = document.getElementById('topic').value;
+        const hook = document.getElementById('hooks').value;
 
-        const tbody = document.querySelector('#sceneTable tbody');
-        tbody.innerHTML = '';
-        (result.scenes || []).forEach(s => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${s.sceneNo}</td><td>${s.visualPromptEn || ''}</td><td>${s.voiceoverCn || ''}</td><td>${s.emotionTag || ''}</td><td>${s.estDurationSec || ''}</td>`;
-            tbody.appendChild(tr);
-        });
+        if (!topic) {
+            alert('请输入主题');
+            return;
+        }
+        if (!hook) {
+            alert('请先生成并选择开头');
+            return;
+        }
+
+        const btn = event.target;
+        btn.dataset.originalText = btn.textContent;
+        setLoading(true, btn);
+
+        try {
+            const body = {
+                userId: 'web-user',
+                topic: topic,
+                persona: document.getElementById('persona').value,
+                durationSec: parseInt(document.getElementById('durationSec').value, 10),
+                selectedHook: hook,
+                searchMode: document.getElementById('searchMode').value
+            };
+            const res = await fetch('/api/shortvideo/generate', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
+            });
+            const data = await res.json();
+            const result = data.data || {};
+
+            currentProjectId = result.projectId;
+            document.getElementById('scriptText').value = result.scriptText || '';
+
+            const metaEl = document.getElementById('meta');
+            metaEl.style.display = 'flex';
+            document.getElementById('meta-projectId').textContent = result.projectId || '-';
+            document.getElementById('meta-title').textContent = result.title || '-';
+            document.getElementById('meta-mode').textContent = (result.meta || {}).searchMode || '-';
+
+            const tbody = document.querySelector('#sceneTable tbody');
+            tbody.innerHTML = '';
+
+            if (result.scenes && result.scenes.length > 0) {
+                result.scenes.forEach(s => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><span class="scene-no">${s.sceneNo}</span></td>
+                        <td><span class="prompt-text">${s.visualPromptEn || ''}</span></td>
+                        <td>${s.voiceoverCn || ''}</td>
+                        <td>${s.emotionTag ? `<span class="emotion-tag">${s.emotionTag}</span>` : ''}</td>
+                        <td><span class="duration">${s.estDurationSec || ''}s</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <p>未生成分镜</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+        } catch (e) {
+            alert('生成脚本失败: ' + e.message);
+        } finally {
+            setLoading(false, btn);
+        }
     }
 
-    /** 浏览器打开下载 Markdown */
     function exportMd() {
-        if (!currentProjectId) return alert('请先生成脚本');
+        if (!currentProjectId) {
+            alert('请先生成脚本');
+            return;
+        }
         window.open(`/api/shortvideo/${currentProjectId}/export.md`, '_blank');
     }
 
-    /** 浏览器打开下载 JSON */
     function exportJson() {
-        if (!currentProjectId) return alert('请先生成脚本');
+        if (!currentProjectId) {
+            alert('请先生成脚本');
+            return;
+        }
         window.open(`/api/shortvideo/${currentProjectId}/export.json`, '_blank');
     }
 </script>
