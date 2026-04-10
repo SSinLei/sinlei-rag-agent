@@ -1,0 +1,118 @@
+<!doctype html>
+<!--
+  AI短视频脚本工坊 - 静态演示页
+  - 上下文路径为 /api，故 fetch 使用 /api/shortvideo/*
+  - 流程：生成开头 -> 选择 -> 生成脚本与分镜 -> 导出 md/json
+-->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI短视频脚本工坊</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 24px; }
+        .row { margin-bottom: 12px; }
+        input, select, textarea, button { padding: 8px; margin-right: 8px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+        th, td { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
+        .muted { color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+<h2>AI短视频脚本工坊</h2>
+<div class="row">
+    <input id="topic" placeholder="输入主题，例如 iPhone16测评" size="36">
+    <input id="persona" placeholder="人设，例如 犀利吐槽风" size="20">
+    <input id="durationSec" type="number" value="60" min="15" max="300">
+    <select id="searchMode">
+        <option value="mock">mock</option>
+        <option value="real">real</option>
+    </select>
+    <button onclick="loadHooks()">生成开头方案</button>
+</div>
+<div class="row">
+    <select id="hooks" style="width: 640px;"></select>
+    <button onclick="generate()">生成完整脚本</button>
+</div>
+<div class="row">
+    <textarea id="scriptText" rows="6" cols="120" placeholder="生成后显示口播文案"></textarea>
+</div>
+<div class="row muted" id="meta"></div>
+<div class="row">
+    <button onclick="exportMd()">导出Markdown</button>
+    <button onclick="exportJson()">导出JSON</button>
+</div>
+<table id="sceneTable">
+    <thead>
+    <tr><th>场景</th><th>画面提示词</th><th>台词</th><th>情绪</th><th>时长</th></tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    /** 最近一次生成返回的 projectId，用于导出 */
+    let currentProjectId = null;
+
+    /** 调用 /hooks，填充下拉框 */
+    async function loadHooks() {
+        const body = {
+            topic: document.getElementById('topic').value,
+            persona: document.getElementById('persona').value,
+            searchMode: document.getElementById('searchMode').value
+        };
+        const res = await fetch('/api/shortvideo/hooks', {
+            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        const hooksSelect = document.getElementById('hooks');
+        hooksSelect.innerHTML = '';
+        (data.data || []).forEach(h => {
+            const option = document.createElement('option');
+            option.value = h;
+            option.text = h;
+            hooksSelect.appendChild(option);
+        });
+    }
+
+    /** 调用 /generate，展示口播与分镜表 */
+    async function generate() {
+        const body = {
+            userId: 'web-user',
+            topic: document.getElementById('topic').value,
+            persona: document.getElementById('persona').value,
+            durationSec: parseInt(document.getElementById('durationSec').value, 10),
+            selectedHook: document.getElementById('hooks').value,
+            searchMode: document.getElementById('searchMode').value
+        };
+        const res = await fetch('/api/shortvideo/generate', {
+            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        const result = data.data || {};
+        currentProjectId = result.projectId;
+        document.getElementById('scriptText').value = result.scriptText || '';
+        document.getElementById('meta').innerText = `projectId=${result.projectId || '-'} | title=${result.title || '-'} | mode=${(result.meta || {}).searchMode || '-'}`;
+
+        const tbody = document.querySelector('#sceneTable tbody');
+        tbody.innerHTML = '';
+        (result.scenes || []).forEach(s => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${s.sceneNo}</td><td>${s.visualPromptEn || ''}</td><td>${s.voiceoverCn || ''}</td><td>${s.emotionTag || ''}</td><td>${s.estDurationSec || ''}</td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    /** 浏览器打开下载 Markdown */
+    function exportMd() {
+        if (!currentProjectId) return alert('请先生成脚本');
+        window.open(`/api/shortvideo/${currentProjectId}/export.md`, '_blank');
+    }
+
+    /** 浏览器打开下载 JSON */
+    function exportJson() {
+        if (!currentProjectId) return alert('请先生成脚本');
+        window.open(`/api/shortvideo/${currentProjectId}/export.json`, '_blank');
+    }
+</script>
+</body>
+</html>

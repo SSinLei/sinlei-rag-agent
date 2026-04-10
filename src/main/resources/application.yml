@@ -56,3 +56,14 @@ rag:
 logging:
   level:
     org.springframework.ai: DEBUG
+
+shortvideo:
+  search:
+    mode: mock
+  duration:
+    speech-rate: 3.8
+  prompt:
+    style-retrieval-top-k: 3
+  real-search:
+    endpoint: https://hn.algolia.com/api/v1/search
+    timeout-ms: 3000

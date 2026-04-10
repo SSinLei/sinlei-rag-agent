@@ -99,3 +99,77 @@ COMMENT ON COLUMN conversation_history.created_at IS '创建时间';
 CREATE INDEX idx_conversation_history_user_id ON conversation_history(user_id);
 CREATE INDEX idx_conversation_history_conv_id ON conversation_history(conversation_id);
 CREATE INDEX idx_conversation_history_created_at ON conversation_history(created_at);
+
+-- ==========================================
+-- 表4: 短视频脚本项目表
+-- 存储一次脚本生成任务的主数据
+-- ==========================================
+CREATE TABLE shortvideo_project (
+    id BIGSERIAL PRIMARY KEY,
+    project_id VARCHAR(64) NOT NULL UNIQUE,
+    user_id VARCHAR(64),
+    topic VARCHAR(255) NOT NULL,
+    persona VARCHAR(64),
+    title VARCHAR(255) NOT NULL,
+    duration_sec INT NOT NULL,
+    selected_hook TEXT,
+    hooks_json TEXT,
+    script_text TEXT,
+    search_mode VARCHAR(16),
+    speech_rate NUMERIC(8,2),
+    style_hint TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+COMMENT ON TABLE shortvideo_project IS '短视频脚本项目主表';
+COMMENT ON COLUMN shortvideo_project.project_id IS '项目唯一ID（业务ID）';
+COMMENT ON COLUMN shortvideo_project.hooks_json IS '黄金3秒开头候选JSON数组';
+COMMENT ON COLUMN shortvideo_project.script_text IS '完整口播文案';
+COMMENT ON COLUMN shortvideo_project.style_hint IS '风格RAG提示摘要';
+
+CREATE INDEX idx_shortvideo_project_user_id ON shortvideo_project(user_id);
+CREATE INDEX idx_shortvideo_project_topic ON shortvideo_project(topic);
+CREATE INDEX idx_shortvideo_project_created_at ON shortvideo_project(created_at);
+
+-- ==========================================
+-- 表5: 短视频分镜表
+-- 存储项目对应的分镜明细
+-- ==========================================
+CREATE TABLE shortvideo_scene (
+    id BIGSERIAL PRIMARY KEY,
+    project_id VARCHAR(64) NOT NULL,
+    scene_no INT NOT NULL,
+    visual_prompt_en TEXT,
+    voiceover_cn TEXT,
+    emotion_tag VARCHAR(32),
+    est_duration_sec INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+COMMENT ON TABLE shortvideo_scene IS '短视频项目分镜明细表';
+COMMENT ON COLUMN shortvideo_scene.project_id IS '关联shortvideo_project.project_id';
+COMMENT ON COLUMN shortvideo_scene.scene_no IS '分镜序号';
+
+CREATE INDEX idx_shortvideo_scene_project_id ON shortvideo_scene(project_id);
+CREATE INDEX idx_shortvideo_scene_scene_no ON shortvideo_scene(scene_no);
+
+-- ==========================================
+-- 表6: 短视频风格样稿表
+-- 存储用户风格样稿，支持风格化RAG
+-- ==========================================
+CREATE TABLE shortvideo_style_sample (
+    id BIGSERIAL PRIMARY KEY,
+    user_id VARCHAR(64),
+    persona VARCHAR(64) NOT NULL,
+    sample_text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+COMMENT ON TABLE shortvideo_style_sample IS '短视频风格样稿表';
+COMMENT ON COLUMN shortvideo_style_sample.persona IS '人设风格名称';
+COMMENT ON COLUMN shortvideo_style_sample.sample_text IS '风格样稿文本';
+
+CREATE INDEX idx_shortvideo_style_user_persona ON shortvideo_style_sample(user_id, persona);
+CREATE INDEX idx_shortvideo_style_created_at ON shortvideo_style_sample(created_at);
